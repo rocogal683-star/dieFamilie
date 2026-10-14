@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die Familie - Deutsch A1</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for gamification rewards -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        .tab-btn.active {
+            background-color: #22c55e;
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        
+        /* Unified Gender & Number Color Coding */
+        .gender-badge-der { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } /* Maskulin - Blue */
+        .gender-badge-das { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } /* Neutrum - Green */
+        .gender-badge-die { background-color: #ffe4e6; color: #9f1239; border: 1px solid #fecdd3; } /* Feminin - Red */
+        .gender-badge-plural { background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; } /* Plural - Orange */
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <header class="bg-white border-b border-emerald-100 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-md shadow-emerald-200">
+                    <i class="fa-solid fa-people-roof"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight">Die Familie <span class="text-emerald-500 text-sm font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">A1.1 (Woche 3)</span></h1>
+                    <p class="text-xs text-slate-500">Lerne Wortschatz, Possessivartikel & Lesen!</p>
+                </div>
+            </div>
+
+            <!-- Score & Progress Display -->
+            <div class="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-200">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-star text-amber-400 text-lg"></i>
+                    <span id="score" class="font-bold text-slate-700 text-lg">0</span>
+                    <span class="text-xs text-slate-400 font-semibold">Punkte</span>
+                </div>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <button onclick="resetAllProgress()" class="text-xs text-slate-500 hover:text-emerald-600 font-semibold flex items-center gap-1 transition" title="Reiniciar todo el progreso">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Section Tabs -->
+        <div class="max-w-5xl mx-auto px-4 mt-1 flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+            <button onclick="switchTab('sec1')" id="tab-sec1" class="tab-btn active px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-key"></i> 1. Mein/Dein Regel & Quiz
+            </button>
+            <button onclick="switchTab('sec2')" id="tab-sec2" class="tab-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-sitemap"></i> 2. Lukas' Familie (Stammbaum)
+            </button>
+            <button onclick="switchTab('sec3')" id="tab-sec3" class="tab-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-gamepad"></i> 3. Das Familien-Quiz (Familie Fischer)
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <section id="sec1" class="space-y-6">
+            <!-- Grammatik-Info Box -->
+            <div class="bg-white rounded-3xl p-6 border border-emerald-100 card-shadow">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </span>
+                    <h2 class="text-xl font-bold text-slate-800">Grammatik-Tipp: <span class="text-emerald-600">Possessivartikel</span> (mein / meine & dein / deine)</h2>
+                </div>
+                
+                <p class="text-sm text-slate-600 mb-4">
+                    Regla rápida en alemán para hablar de <strong>tu familia</strong>: El <strong>possessivartikel</strong> cambia según el género gramatical y número de la palabra.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+                    <!-- Männlich (der) - Azul -->
+                    <div class="bg-blue-50/70 rounded-2xl p-3.5 border border-blue-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-blue-900 text-xs flex items-center gap-1.5 mb-2">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold gender-badge-der">der</span> Maskulin
+                            </span>
+                            <div class="space-y-1.5 text-xs text-slate-700">
+                                <p class="bg-white p-2 rounded-lg border border-blue-100">
+                                    <strong class="text-blue-600">mein</strong> Bruder / Vater
+                                </p>
+                                <p class="bg-white p-2 rounded-lg border border-blue-100">
+                                    <strong class="text-blue-600">dein</strong> Sohn / Opa
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-blue-700 mt-2 font-semibold">Sin final (-Ø)</p>
+                    </div>
+
+                    <!-- Neutral (das) - Verde -->
+                    <div class="bg-emerald-50/70 rounded-2xl p-3.5 border border-emerald-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-emerald-900 text-xs flex items-center gap-1.5 mb-2">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold gender-badge-das">das</span> Neutral
+                            </span>
+                            <div class="space-y-1.5 text-xs text-slate-700">
+                                <p class="bg-white p-2 rounded-lg border border-emerald-100">
+                                    <strong class="text-emerald-600">mein</strong> Kind / Baby
+                                </p>
+                                <p class="bg-white p-2 rounded-lg border border-emerald-100">
+                                    <strong class="text-emerald-600">dein</strong> Mädchen
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-emerald-700 mt-2 font-semibold">Sin final (-Ø)</p>
+                    </div>
+
+                    <!-- Feminin (die) - Rojo -->
+                    <div class="bg-rose-50/70 rounded-2xl p-3.5 border border-rose-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-rose-900 text-xs flex items-center gap-1.5 mb-2">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold gender-badge-die">die</span> Feminin
+                            </span>
+                            <div class="space-y-1.5 text-xs text-slate-700">
+                                <p class="bg-white p-2 rounded-lg border border-rose-100">
+                                    <strong class="text-rose-600">meine</strong> Mutter / Schwester
+                                </p>
+                                <p class="bg-white p-2 rounded-lg border border-rose-100">
+                                    <strong class="text-rose-600">deine</strong> Tochter / Oma
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-rose-700 mt-2 font-semibold">Termina en <strong>-e</strong></p>
+                    </div>
+
+                    <!-- Plural (die) - Naranja -->
+                    <div class="bg-orange-50/70 rounded-2xl p-3.5 border border-orange-200 flex flex-col justify-between">
+                        <div>
+                            <span class="font-bold text-orange-900 text-xs flex items-center gap-1.5 mb-2">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold gender-badge-plural">die</span> Plural
+                            </span>
+                            <div class="space-y-1.5 text-xs text-slate-700">
+                                <p class="bg-white p-2 rounded-lg border border-orange-100">
+                                    <strong class="text-orange-600">meine</strong> Eltern
+                                </p>
+                                <p class="bg-white p-2 rounded-lg border border-orange-100">
+                                    <strong class="text-orange-600">deine</strong> Geschwister
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-orange-700 mt-2 font-semibold">Termina en <strong>-e</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mini Practice 1 -->
+            <div class="bg-white rounded-3xl p-6 border border-emerald-100 card-shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i> Übung 1: Wähle die richtige Form! (Elige la correcta)
+                    </h3>
+                    <span id="s1-progress" class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">0/6 completados</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="s1-questions-container">
+                    <!-- Question items populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <section id="sec2" class="hidden space-y-6">
+            <div class="bg-emerald-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-emerald-800 rounded-full opacity-50 blur-2xl"></div>
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-4 justify-between">
+                    <div>
+                        <span class="bg-emerald-800 text-emerald-200 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Interaktiver Stammbaum</span>
+                        <h2 class="text-2xl font-bold mt-1">Das ist die Familie von Lukas!</h2>
+                        <p class="text-emerald-100 text-sm mt-1 max-w-xl">
+                            Haz clic en cada miembro de la familia para ver su carné completo (Beruf, Sprachen, Familienstand) y escuchar su audio en alemán.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 bg-emerald-800/80 p-3 rounded-2xl border border-emerald-700/50">
+                        <div class="w-12 h-12 rounded-full bg-amber-200 text-slate-800 flex items-center justify-center text-xl font-bold border-2 border-white">
+                            👦
+                        </div>
+                        <div>
+                            <div class="text-xs text-emerald-300">Ich bin</div>
+                            <div class="font-bold text-base">Lukas (10 / zehn)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Tree Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Family Tree Visual Container -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-emerald-100 card-shadow flex flex-col justify-between">
+                    <h3 class="text-center text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-hand-pointer text-emerald-500 mr-1"></i> Haz clic sobre una persona para ver sus datos y escuchar el audio
+                    </h3>
+
+                    <div class="space-y-6 py-2">
+                        <!-- Generation 1: Grandparents -->
+                        <div class="flex justify-center gap-4 sm:gap-8">
+                            <!-- Opa -->
+                            <button onclick="selectFamilyMember('opa')" id="btn-opa" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-3xl sm:text-4xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👴
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-der px-1.5 py-0.5 rounded-md">der</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">der Opa</span>
+                                <span class="text-[11px] text-slate-400">Walter (72)</span>
+                            </button>
+
+                            <!-- Oma -->
+                            <button onclick="selectFamilyMember('oma')" id="btn-oma" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-rose-50 border-2 border-rose-200 flex items-center justify-center text-3xl sm:text-4xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👵
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-die px-1.5 py-0.5 rounded-md">die</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">die Oma</span>
+                                <span class="text-[11px] text-slate-400">Helga (69)</span>
+                            </button>
+                        </div>
+
+                        <!-- Connecting line -->
+                        <div class="w-0.5 h-4 bg-slate-200 mx-auto"></div>
+
+                        <!-- Generation 2: Parents -->
+                        <div class="flex justify-center gap-4 sm:gap-8">
+                            <!-- Vater -->
+                            <button onclick="selectFamilyMember('vater')" id="btn-vater" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-3xl sm:text-4xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👨
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-der px-1.5 py-0.5 rounded-md">der</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">der Vater</span>
+                                <span class="text-[11px] text-slate-400">Thomas (42)</span>
+                            </button>
+
+                            <!-- Mutter -->
+                            <button onclick="selectFamilyMember('mutter')" id="btn-mutter" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-rose-50 border-2 border-rose-200 flex items-center justify-center text-3xl sm:text-4xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👩
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-die px-1.5 py-0.5 rounded-md">die</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">die Mutter</span>
+                                <span class="text-[11px] text-slate-400">Sabine (40)</span>
+                            </button>
+                        </div>
+
+                        <!-- Connecting line -->
+                        <div class="w-0.5 h-4 bg-slate-200 mx-auto"></div>
+
+                        <!-- Generation 3: Children / Siblings -->
+                        <div class="flex justify-center gap-3 sm:gap-6">
+                            <!-- Lukas (Self) -->
+                            <button onclick="selectFamilyMember('lukas')" id="btn-lukas" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-2xl sm:text-3xl shadow-md relative">
+                                    👦
+                                    <span class="absolute -bottom-2 bg-emerald-600 text-white text-[9px] px-1.5 py-0.2 rounded-full font-bold">ICH</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700">Lukas</span>
+                                <span class="text-[10px] text-slate-400">10 J.</span>
+                            </button>
+
+                            <!-- Schwester -->
+                            <button onclick="selectFamilyMember('schwester')" id="btn-schwester" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-rose-50 border-2 border-rose-200 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👧
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-die px-1 py-0.5 rounded-md">die</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">die Schwester</span>
+                                <span class="text-[10px] text-slate-400">Emma (7)</span>
+                            </button>
+
+                            <!-- Bruder -->
+                            <button onclick="selectFamilyMember('bruder')" id="btn-bruder" class="fam-card group flex flex-col items-center transition transform hover:-translate-y-1">
+                                <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-50 border-2 border-blue-200 flex items-center justify-center text-2xl sm:text-3xl shadow-md group-hover:border-emerald-500 transition relative">
+                                    👶
+                                    <span class="absolute -top-2 -right-2 text-xs font-bold gender-badge-der px-1 py-0.5 rounded-md">der</span>
+                                </div>
+                                <span class="mt-2 text-xs font-bold text-slate-700 group-hover:text-emerald-600">der Bruder</span>
+                                <span class="text-[10px] text-slate-400">Leon (3)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Card Panel -->
+                <div class="bg-white rounded-3xl p-6 border border-emerald-100 card-shadow flex flex-col justify-between" id="member-card-panel">
+                    <!-- Default message before selection -->
+                    <div id="card-placeholder" class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+                        <i class="fa-solid fa-address-card text-5xl text-emerald-200 mb-3 animate-pulse"></i>
+                        <p class="font-bold text-slate-600 mb-1">Elige a un miembro de la familia</p>
+                        <p class="text-xs">Para ver su carné con frases A1 y escuchar el audio en alemán.</p>
+                    </div>
+
+                    <!-- Member Detail View (Hidden initially) -->
+                    <div id="card-details" class="hidden space-y-4">
+                        <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
+                            <span id="detail-avatar" class="text-4xl p-2 rounded-2xl bg-emerald-50 border border-emerald-100">👴</span>
+                            <div>
+                                <span id="detail-relation" class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Mein Vater</span>
+                                <h4 id="detail-name" class="text-xl font-bold text-slate-800">Thomas</h4>
+                            </div>
+                        </div>
+
+                        <!-- Speech bubble from Lukas -->
+                        <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 relative text-sm text-slate-700 space-y-2">
+                            <div class="flex items-center justify-between text-xs text-slate-400 font-semibold mb-1">
+                                <span><i class="fa-solid fa-comment-dots text-emerald-500 mr-1"></i> Lukas sagt:</span>
+                                <button id="audio-play-btn" onclick="speakText()" class="text-emerald-600 hover:text-emerald-700 flex items-center gap-1.5 font-bold text-xs bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg transition">
+                                    <i id="audio-icon" class="fa-solid fa-volume-high"></i> <span id="audio-btn-text">Escuchar</span>
+                                </button>
+                            </div>
+                            <p id="detail-speech" class="font-medium leading-relaxed italic text-slate-800 bg-white p-3 rounded-xl border border-slate-200">
+                                "Das ist mein Vater..."
+                            </p>
+                        </div>
+
+                        <!-- A1 Data Sheet (Includes Beruf and Sprachen) -->
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="text-slate-400 block font-semibold">Alter:</span>
+                                <strong id="detail-age" class="text-slate-700 text-xs">42 (zweiundvierzig)</strong>
+                            </div>
+                            <div class="bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="text-slate-400 block font-semibold">Wohnort:</span>
+                                <strong id="detail-city" class="text-slate-700 text-xs">Berlin</strong>
+                            </div>
+                            <div class="bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="text-slate-400 block font-semibold">Herkunft:</span>
+                                <strong id="detail-country" class="text-slate-700 text-xs">Deutschland</strong>
+                            </div>
+                            <div class="bg-emerald-50/50 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="text-slate-400 block font-semibold">Familienstand:</span>
+                                <strong id="detail-status" class="text-slate-700 text-xs">verheiratet</strong>
+                            </div>
+                            <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-200 col-span-2">
+                                <span class="text-amber-800 block font-semibold"><i class="fa-solid fa-briefcase text-amber-500 mr-1"></i> Beruf:</span>
+                                <strong id="detail-job" class="text-slate-800 text-xs">Lehrer</strong>
+                            </div>
+                            <div class="bg-blue-50/70 p-2.5 rounded-xl border border-blue-200 col-span-2">
+                                <span class="text-blue-800 block font-semibold"><i class="fa-solid fa-language text-blue-500 mr-1"></i> Sprachen:</span>
+                                <strong id="detail-languages" class="text-slate-800 text-xs">Deutsch, Englisch</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec3" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 border border-emerald-100 card-shadow">
+                <!-- Quiz Header -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                            Leseverstehen & Grammatik
+                        </span>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-1">Das Quiz: Familie Fischer</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Lies den Stammbaum von Familie Fischer und beantworte die Fragen!</p>
+                    </div>
+
+                    <!-- Progress Indicator -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 font-bold">Frage:</span>
+                        <span id="quiz-step-text" class="text-sm font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-xl">1 / 5</span>
+                    </div>
+                </div>
+
+                <!-- FISCHER FAMILY REFERENCE BOARD WITH S-GENITIV & FIXED MIA SCHÜLERIN LAYOUT -->
+                <div class="my-5 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-3">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-sitemap text-emerald-600"></i> Stammbaum & Daten von Familie Fischer:
+                    </h3>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                        <!-- Mia -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👧 Mia Fischer</span> 
+                                <span class="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded font-bold whitespace-nowrap">Ich</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 12 (zwölf) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> ledig / single</p>
+                            <p class="text-slate-600 flex items-center gap-1"><strong>Beruf:</strong> <span class="whitespace-nowrap font-medium text-slate-800">Schülerin</span></p>
+                            <p class="text-slate-600"><strong>Sprachen:</strong> Deutsch, 2 (zwei) Sprachen (Englisch)</p>
+                            <p class="text-slate-600"><strong>Wohnort:</strong> Köln (Deutschland)</p>
+                        </div>
+
+                        <!-- Marc (Mias Bruder) -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👦 Marc</span>
+                                <span class="text-[10px] gender-badge-der px-2 py-0.5 rounded font-bold whitespace-nowrap">Mias Bruder</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 8 (acht) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> ledig / single</p>
+                            <p class="text-slate-600"><strong>Beruf:</strong> Schüler</p>
+                            <p class="text-slate-600"><strong>Sprachen:</strong> Deutsch, 1 (ein) bisschen Englisch</p>
+                        </div>
+
+                        <!-- Sabine (Mias Mutter) -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👩 Sabine</span>
+                                <span class="text-[10px] gender-badge-die px-2 py-0.5 rounded font-bold whitespace-nowrap">Mias Mutter</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 42 (zweiundvierzig) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> verheiratet</p>
+                            <p class="text-slate-600"><strong>Beruf:</strong> Ärztin</p>
+                            <p class="text-slate-600"><strong>Sprachen:</strong> Deutsch, Englisch, Französisch (3 Sprachen)</p>
+                        </div>
+
+                        <!-- Peter (Mias Vater) -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👨 Peter</span>
+                                <span class="text-[10px] gender-badge-der px-2 py-0.5 rounded font-bold whitespace-nowrap">Mias Vater</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 45 (fünfundvierzig) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> verheiratet</p>
+                            <p class="text-slate-600"><strong>Beruf:</strong> Ingenieur</p>
+                            <p class="text-slate-600"><strong>Herkunft:</strong> Österreich</p>
+                            <p class="text-slate-600"><strong>Sprachen:</strong> Deutsch, Englisch</p>
+                        </div>
+
+                        <!-- Maria (Mias Oma) -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👵 Maria</span>
+                                <span class="text-[10px] gender-badge-die px-2 py-0.5 rounded font-bold whitespace-nowrap">Mias Oma</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 70 (siebzig) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> verwitwet (viuda)</p>
+                            <p class="text-slate-600"><strong>Beruf:</strong> Rentnerin (jubilada)</p>
+                            <p class="text-slate-600"><strong>Wohnort:</strong> Wien (Österreich)</p>
+                        </div>
+
+                        <!-- Hans (Mias Opa) -->
+                        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm space-y-1">
+                            <div class="font-bold text-slate-800 text-sm flex items-center justify-between gap-2 border-b border-slate-100 pb-1.5 mb-1.5">
+                                <span>👴 Hans</span>
+                                <span class="text-[10px] gender-badge-der px-2 py-0.5 rounded font-bold whitespace-nowrap">Mias Opa</span>
+                            </div>
+                            <p class="text-slate-600"><strong>Alter:</strong> 73 (dreiundsiebzig) Jahre alt</p>
+                            <p class="text-slate-600"><strong>Familienstand:</strong> verheiratet</p>
+                            <p class="text-slate-600"><strong>Beruf:</strong> Rentner (jubilado)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Card Container -->
+                <div class="mt-4" id="quiz-card">
+                    <!-- Active question injects here -->
+                </div>
+
+                <!-- Quiz Navigation Buttons -->
+                <div class="mt-6 flex justify-between items-center pt-4 border-t border-slate-100">
+                    <button id="prev-quiz-btn" onclick="changeQuizQuestion(-1)" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Zurück
+                    </button>
+                    <button id="next-quiz-btn" onclick="changeQuizQuestion(1)" class="px-5 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-sm hover:bg-emerald-600 transition shadow-md shadow-emerald-200 flex items-center gap-2">
+                        Weiter <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-4 mt-8">
+        <div class="max-w-5xl mx-auto px-4 text-center text-xs text-slate-400">
+            <p>Deutsch als Fremdsprache (DaF) • Interaktive Lernkarte für A1.1</p>
+        </div>
+    </footer>
+
+    <script>
+
+        // Game State Variables
+        let totalScore = 0;
+        let s1Score = {};
+        let currentQuizIndex = 0;
+        let selectedMemberKey = null;
+
+        // SECTION 1 DATA: Possessive Mini Exercises WITHOUT explicit gender hints
+        const sec1Data = [
+            { id: 1, text: "Das ist ______ Vater.", options: ["mein", "meine"], correct: "mein" },
+            { id: 2, text: "Ist das ______ Mutter?", options: ["dein", "deine"], correct: "deine" },
+            { id: 3, text: "Das ist ______ Schwester.", options: ["mein", "meine"], correct: "meine" },
+            { id: 4, text: "Wie heißt ______ Bruder?", options: ["dein", "deine"], correct: "dein" },
+            { id: 5, text: "Wo wohnen ______ Eltern?", options: ["dein", "deine"], correct: "deine" },
+            { id: 6, text: "Das ist ______ Kind.", options: ["mein", "meine"], correct: "mein" }
+        ];
+
+        // SECTION 2 DATA: Lukas Family Details with adjusted Thomas text and languages spoken
+        const familyData = {
+            vater: {
+                relation: "Mein Vater",
+                article: "der",
+                name: "Thomas",
+                age: "42 (zweiundvierzig) Jahre alt",
+                city: "Berlin",
+                country: "Deutschland",
+                status: "verheiratet",
+                job: "Lehrer (profesor)",
+                languages: "Deutsch, Englisch (2 Sprachen)",
+                avatar: "👨",
+                speech: "Das ist mein Vater Thomas. Er ist 42 Jahre alt. Er ist verheiratet und Lehrer von Beruf. Er spricht Deutsch und Englisch."
+            },
+            mutter: {
+                relation: "Meine Mutter",
+                article: "die",
+                name: "Sabine",
+                age: "40 (vierzig) Jahre alt",
+                city: "Berlin",
+                country: "Österreich",
+                status: "verheiratet",
+                job: "Ärztin (médica)",
+                languages: "Deutsch, Englisch, ein bisschen Spanisch",
+                avatar: "👩",
+                speech: "Das ist meine Mutter Sabine. Sie ist 40 Jahre alt. Sie kommt aus Österreich und ist Ärztin von Beruf. Sie spricht Deutsch, Englisch und ein bisschen Spanisch."
+            },
+            opa: {
+                relation: "Mein Opa",
+                article: "der",
+                name: "Walter",
+                age: "72 (zweiundsiebzig) Jahre alt",
+                city: "München",
+                country: "Deutschland",
+                status: "verheiratet",
+                job: "Rentner (jubilado)",
+                languages: "Deutsch",
+                avatar: "👴",
+                speech: "Das ist mein Opa Walter. Er ist 72 Jahre alt, wohnt in München und ist Rentner. Er spricht Deutsch."
+            },
+            oma: {
+                relation: "Meine Oma",
+                article: "die",
+                name: "Helga",
+                age: "69 (neunundsechzig) Jahre alt",
+                city: "München",
+                country: "Deutschland",
+                status: "verheiratet",
+                job: "Rentnerin (jubilada)",
+                languages: "Deutsch, Italienisch",
+                avatar: "👵",
+                speech: "Das ist meine Oma Helga. Sie ist 69 Jahre alt. Sie wohnt in München und ist Rentnerin. Sie spricht Deutsch und Italienisch."
+            },
+            schwester: {
+                relation: "Meine Schwester",
+                article: "die",
+                name: "Emma",
+                age: "7 (sieben) Jahre alt",
+                city: "Berlin",
+                country: "Deutschland",
+                status: "ledig / single",
+                job: "Schülerin (estudiante)",
+                languages: "Deutsch, ein bisschen Englisch",
+                avatar: "👧",
+                speech: "Das ist meine Schwester Emma. Sie ist 7 Jahre alt, ledig und geht in die Schule. Sie spricht Deutsch und ein bisschen Englisch."
+            },
+            bruder: {
+                relation: "Mein Bruder",
+                article: "der",
+                name: "Leon",
+                age: "3 (drei) Jahre alt",
+                city: "Berlin",
+                country: "Deutschland",
+                status: "ledig / single",
+                job: "Kind (en el jardín de infancia)",
+                languages: "Deutsch",
+                avatar: "👶",
+                speech: "Das ist mein kleiner Bruder Leon. Er ist erst 3 Jahre alt und ledig. Er spricht schon Deutsch."
+            },
+            lukas: {
+                relation: "Ich (Lukas)",
+                article: "der",
+                name: "Lukas",
+                age: "10 (zehn) Jahre alt",
+                city: "Berlin",
+                country: "Deutschland",
+                status: "ledig / single",
+                job: "Schüler (estudiante)",
+                languages: "Deutsch, Englisch (in der Schule)",
+                avatar: "👦",
+                speech: "Hallo! Ich bin Lukas. Ich bin 10 Jahre alt, ledig und Schüler. Ich wohne in Berlin und ich spreche Deutsch und Englisch in der Schule!"
+            }
+        };
+
+        // SECTION 3 DATA: Comprehensive Quiz for Familie Fischer using Saxon Genitive (s-Genitiv)
+        const quizQuestions = [
+            {
+                type: "choice",
+                question: "Wie alt ist Marc, Mias Bruder?",
+                options: ["7 (sieben) Jahre alt", "8 (acht) Jahre alt", "12 (zwölf) Jahre alt"],
+                correct: 1,
+                explanation: "Marc ist Mias Bruder. Er ist 8 (acht) Jahre alt und Schüler."
+            },
+            {
+                type: "choice",
+                question: "Was ist Mias Mutter von Beruf?",
+                options: ["Sie ist Ärztin von Beruf.", "Sie ist Lehrerin von Beruf.", "Sie ist Rentnerin von Beruf."],
+                correct: 0,
+                explanation: "Mias Mutter Sabine ist Ärztin von Beruf."
+            },
+            {
+                type: "choice",
+                question: "Woher kommt Peter, Mias Vater?",
+                options: ["Er kommt aus Deutschland.", "Er kommt aus Österreich.", "Er kommt aus der Schweiz."],
+                correct: 1,
+                explanation: "Peter ist Mias Vater. Er ist 45 (fünfundvierzig) Jahre alt und kommt aus Österreich."
+            },
+            {
+                type: "choice",
+                question: "Wie viele Sprachen spricht Mias Mutter Sabine?",
+                options: ["1 (eine) Sprache", "2 (zwei) Sprachen", "3 (drei) Sprachen (Deutsch, Englisch, Französisch)"],
+                correct: 2,
+                explanation: "Mias Mutter Sabine spricht 3 (drei) Sprachen: Deutsch, Englisch und Französisch."
+            },
+            {
+                type: "choice",
+                question: "Wer ist 70 (siebzig) Jahre alt und ist Mias Oma?",
+                options: ["Opa Hans", "Oma Maria", "Mutter Sabine"],
+                correct: 1,
+                explanation: "Oma Maria ist Mias Oma. Sie ist 70 (siebzig) Jahre alt, verwitwet und wohnt in Wien."
+            }
+        ];
+
+
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-600');
+        }
+
+        // Initialize Section 1 Exercises
+        function renderSection1() {
+            const container = document.getElementById('s1-questions-container');
+            container.innerHTML = '';
+
+            sec1Data.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 flex flex-col justify-between";
+                
+                card.innerHTML = `
+                    <div class="text-sm font-semibold text-slate-800">
+                        <span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-md mr-1">${index + 1}</span> 
+                        ${q.text}
+                    </div>
+                    <div class="grid grid-cols-2 gap-2" id="s1-options-${q.id}">
+                        ${q.options.map(opt => `
+                            <button onclick="checkSec1Answer(${q.id}, '${opt}')" class="py-2 px-3 rounded-xl border border-slate-300 bg-white hover:border-emerald-400 font-bold text-slate-700 text-sm transition">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div id="s1-feedback-${q.id}" class="text-xs font-bold hidden"></div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkSec1Answer(id, selectedOption) {
+            const q = sec1Data.find(item => item.id === id);
+            const feedbackEl = document.getElementById(`s1-feedback-${id}`);
+            const optionsContainer = document.getElementById(`s1-options-${id}`);
+
+            if (selectedOption === q.correct) {
+                if (!s1Score[id]) {
+                    addPoints(10);
+                    s1Score[id] = true;
+                }
+                feedbackEl.className = "text-xs font-bold text-emerald-600 bg-emerald-50 p-2 rounded-xl border border-emerald-200 flex items-center gap-1.5";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> Richtig! Super gemacht (+10 Pkt.)`;
+                
+                // Highlight button
+                Array.from(optionsContainer.children).forEach(btn => {
+                    if (btn.innerText.trim() === selectedOption) {
+                        btn.className = "py-2 px-3 rounded-xl border border-emerald-500 bg-emerald-500 text-white font-bold text-sm shadow-md";
+                    } else {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.5';
+                    }
+                });
+            } else {
+                feedbackEl.className = "text-xs font-bold text-rose-600 bg-rose-50 p-2 rounded-xl border border-rose-200 flex items-center gap-1.5";
+                feedbackEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Falsch. Versuch es noch einmal!`;
+            }
+            feedbackEl.classList.remove('hidden');
+
+            // Update section progress count
+            const completedCount = Object.keys(s1Score).length;
+            document.getElementById('s1-progress').innerText = `${completedCount}/6 completados`;
+
+            if (completedCount === sec1Data.length) {
+                triggerConfetti();
+            }
+        }
+
+
+        function selectFamilyMember(key) {
+            selectedMemberKey = key;
+            const data = familyData[key];
+
+            // Highlight selected button
+            document.querySelectorAll('.fam-card').forEach(c => {
+                c.classList.remove('ring-4', 'ring-emerald-400', 'rounded-2xl');
+            });
+            const selectedBtn = document.getElementById(`btn-${key}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('ring-4', 'ring-emerald-400', 'rounded-2xl');
+            }
+
+            // Hide placeholder, show details
+            document.getElementById('card-placeholder').classList.add('hidden');
+            const details = document.getElementById('card-details');
+            details.classList.remove('hidden');
+
+            // Populate data
+            document.getElementById('detail-avatar').innerText = data.avatar;
+            document.getElementById('detail-relation').innerText = data.relation;
+            document.getElementById('detail-name').innerText = data.name;
+            document.getElementById('detail-speech').innerText = `"${data.speech}"`;
+            document.getElementById('detail-age').innerText = data.age;
+            document.getElementById('detail-city').innerText = data.city;
+            document.getElementById('detail-country').innerText = data.country;
+            document.getElementById('detail-status').innerText = data.status;
+            document.getElementById('detail-job').innerText = data.job;
+            document.getElementById('detail-languages').innerText = data.languages;
+
+            // Automatically play speech audio
+            speakText();
+        }
+
+        // Dual Audio Engine: Web Speech API with fallback Audio TTS
+        let activeAudio = null;
+
+        function setAudioState(isPlaying) {
+            const icon = document.getElementById('audio-icon');
+            const btnText = document.getElementById('audio-btn-text');
+            if (!icon || !btnText) return;
+
+            if (isPlaying) {
+                icon.className = "fa-solid fa-spinner fa-spin text-emerald-600";
+                btnText.innerText = "Spreche...";
+            } else {
+                icon.className = "fa-solid fa-volume-high text-emerald-600";
+                btnText.innerText = "Escuchar";
+            }
+        }
+
+        function speakText() {
+            if (!selectedMemberKey) return;
+            const text = familyData[selectedMemberKey].speech;
+
+            setAudioState(true);
+
+            // Stop any playing fallback audio
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio = null;
+            }
+
+            // Method 1: Web Speech API
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'de-DE';
+                utterance.rate = 0.85;
+
+                let voices = window.speechSynthesis.getVoices();
+                let germanVoice = voices.find(v => v.lang.startsWith('de'));
+                
+                if (germanVoice) {
+                    utterance.voice = germanVoice;
+                }
+
+                utterance.onend = function() {
+                    setAudioState(false);
+                };
+
+                utterance.onerror = function() {
+                    fallbackTTS(text);
+                };
+
+                window.speechSynthesis.speak(utterance);
+
+                // Safety timeout in case speech synth hangs
+                setTimeout(() => {
+                    if (window.speechSynthesis.speaking) {
+                        setAudioState(false);
+                    }
+                }, 7000);
+
+            } else {
+                fallbackTTS(text);
+            }
+        }
+
+        // Method 2: Fallback Audio Stream using Google TTS URL
+        function fallbackTTS(text) {
+            try {
+                const encodedText = encodeURIComponent(text);
+                const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=de&client=tw-ob&q=${encodedText}`;
+                
+                activeAudio = new Audio(url);
+                activeAudio.play().then(() => {
+                    activeAudio.onended = () => setAudioState(false);
+                }).catch(err => {
+                    console.warn("Audio fallback error:", err);
+                    setAudioState(false);
+                });
+            } catch (e) {
+                setAudioState(false);
+            }
+        }
+
+        // Pre-load voices if SpeechSynthesis requires event callback
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.getVoices();
+            };
+        }
+
+
+        function renderQuizQuestion() {
+            const container = document.getElementById('quiz-card');
+            const q = quizQuestions[currentQuizIndex];
+
+            document.getElementById('quiz-step-text').innerText = `${currentQuizIndex + 1} / ${quizQuestions.length}`;
+
+            let html = `
+                <div class="space-y-4">
+                    <h3 class="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <span class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-extrabold flex-shrink-0">${currentQuizIndex + 1}</span>
+                        ${q.question}
+                    </h3>
+
+                    <div class="space-y-2.5 mt-4">
+                        ${q.options.map((opt, idx) => `
+                            <button onclick="checkQuizAnswer(${idx})" id="quiz-opt-${idx}" class="w-full text-left p-3.5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-300 font-bold text-slate-700 text-sm transition flex items-center justify-between">
+                                <span>${opt}</span>
+                                <i class="fa-regular fa-circle text-slate-300 text-lg"></i>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <div id="quiz-explanation" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Update Prev/Next buttons state
+            document.getElementById('prev-quiz-btn').disabled = currentQuizIndex === 0;
+            const nextBtn = document.getElementById('next-quiz-btn');
+            if (currentQuizIndex === quizQuestions.length - 1) {
+                nextBtn.innerHTML = `Abschließen <i class="fa-solid fa-trophy"></i>`;
+            } else {
+                nextBtn.innerHTML = `Weiter <i class="fa-solid fa-arrow-right"></i>`;
+            }
+        }
+
+        let answeredQuestions = {};
+
+        function checkQuizAnswer(optIndex) {
+            const q = quizQuestions[currentQuizIndex];
+            const explanationEl = document.getElementById('quiz-explanation');
+
+            // Prevent multiple points for same question
+            const isFirstAttempt = !answeredQuestions[currentQuizIndex];
+
+            if (optIndex === q.correct) {
+                if (isFirstAttempt) {
+                    addPoints(20);
+                    answeredQuestions[currentQuizIndex] = true;
+                    triggerConfetti();
+                }
+
+                document.getElementById(`quiz-opt-${optIndex}`).className = "w-full text-left p-3.5 rounded-2xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800 font-bold text-sm transition flex items-center justify-between";
+                document.getElementById(`quiz-opt-${optIndex}`).querySelector('i').className = "fa-solid fa-circle-check text-emerald-500 text-lg";
+
+                explanationEl.className = "p-4 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200";
+                explanationEl.innerHTML = `<i class="fa-solid fa-thumbs-up mr-1 text-sm"></i> <strong>Richtig!</strong> ${q.explanation}`;
+            } else {
+                document.getElementById(`quiz-opt-${optIndex}`).className = "w-full text-left p-3.5 rounded-2xl border-2 border-rose-300 bg-rose-50 text-rose-800 font-bold text-sm transition flex items-center justify-between";
+                document.getElementById(`quiz-opt-${optIndex}`).querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500 text-lg";
+
+                explanationEl.className = "p-4 rounded-2xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200";
+                explanationEl.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1 text-sm"></i> <strong>Nicht ganz!</strong> Schau noch einmal in den Stammbaum.`;
+            }
+
+            explanationEl.classList.remove('hidden');
+        }
+
+        function changeQuizQuestion(delta) {
+            const newIndex = currentQuizIndex + delta;
+            if (newIndex >= 0 && newIndex < quizQuestions.length) {
+                currentQuizIndex = newIndex;
+                renderQuizQuestion();
+            } else if (newIndex >= quizQuestions.length) {
+                // Completed all questions
+                alert(`🎉 ¡Herzlichen Glückwunsch! Has completado el quiz con ${totalScore} puntos.`);
+            }
+        }
+
+        function addPoints(pts) {
+            totalScore += pts;
+            document.getElementById('score').innerText = totalScore;
+        }
+
+        function resetAllProgress() {
+            totalScore = 0;
+            s1Score = {};
+            answeredQuestions = {};
+            currentQuizIndex = 0;
+            document.getElementById('score').innerText = '0';
+            renderSection1();
+            renderQuizQuestion();
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 60,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            renderSection1();
+            renderQuizQuestion();
+        };
+    </script>
+</body>
+</html>
